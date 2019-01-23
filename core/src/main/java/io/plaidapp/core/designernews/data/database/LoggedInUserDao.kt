@@ -40,19 +40,22 @@ abstract class LoggedInUserDao {
      * This method should be used instead of [insertLoggedInUser].
      */
     @Transaction
-    open fun setLoggedInUser(loggedInUser: LoggedInUser) {
+    open suspend fun setLoggedInUser(loggedInUser: LoggedInUser) {
         deleteLoggedInUser()
         insertLoggedInUser(loggedInUser)
     }
 
     @Query("DELETE FROM logged_in_user")
-    abstract fun deleteLoggedInUser()
+    abstract suspend fun deleteLoggedInUser()
 
     /**
      * This method should not be used.  Instead, use [setLoggedInUser],
      * as that method guarantees only a single [LoggedInUser] will reside
      * in the table.
      */
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
+    abstract suspend fun insertLoggedInUserSuspend(loggedInUser: LoggedInUser)
+
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     abstract fun insertLoggedInUser(loggedInUser: LoggedInUser)
 }
